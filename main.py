@@ -5,11 +5,15 @@ from operator import attrgetter
 import os
 from sre_constants import SUCCESS
 import sys
+from traceback import print_tb
 from typing import List
 from Node import Node
 
+
 def cls():
-    os.system('cls' if os.name=='nt' else 'clear') 
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 heuristic = {"arad": 366,
              "bucharest": 0,
              "craiova": 160,
@@ -33,6 +37,8 @@ heuristic = {"arad": 366,
              }
 
 # the h function will return the distance if city is found
+
+
 def h(name: str) -> int:
     if not name in heuristic.keys():
         print("City not found: " + name)
@@ -41,26 +47,38 @@ def h(name: str) -> int:
         return heuristic[name]
 
 # The goal is to find the shortest path to Bucharest
+
+
 def recursive_best_first_search(start: str):
     start_node = Node(start)
     return RBFS(start_node, sys.maxsize)
+
 
 class Result(Enum):
     SUCCESS = 1
     FAILURE = 2
 
-def RBFS( current_node: Node, f_limit: int):
+
+def RBFS(current_node: Node, f_limit: int):
     if current_node.name == "bucharest":
+        print("You are already at the goal!")
         return Result.SUCCESS
     successors: List[Node] = []
     for succ in current_node.successors():
         succ_node = Node(succ)
-        succ_node.f_cost = max(succ_node.g(current_node.name) + h(succ), current_node.f_cost)
+        succ_node.f_cost = max(succ_node.g(
+            current_node.name) + h(succ), current_node.f_cost)
         successors.append(succ_node)
     successors.sort(key=attrgetter("f_cost"))
-    print(*successors)
+
+    while True:
+        best = min(successors, key=attrgetter("f_cost"))
+        if best.f_cost > f_limit:
+            return Result.FAILURE, best.f_cost
+
 
 def start():
+    cls()
     print("Romanian City Problem using the RBFS\n")
     #print(f"Available start city\n -> {[key  for key in heuristic.keys()]}")
     start_city = input("Insert the start city: ")
@@ -68,16 +86,18 @@ def start():
         cls()
         print("The city you enterd is not valid, please try another one.\n")
         start_city = input("Insert the start city: ")
-        
-    recursive_best_first_search(start_city)
-     
+
+    return recursive_best_first_search(start_city)
 
 
 def main():
-    start()
-    
-###########################################################
+    if start():
+        ty = 1 if input("Do you want to try again? y/n") == "y" else 0
+        if ty:
+            start()
 
+
+###########################################################
 
 if __name__ == '__main__':
     main()
