@@ -9,10 +9,9 @@ class Node:
     def __str__(self) -> str:
         return self.__repr__()
 
-    def __init__(self, name: str, f_cost: int = 0, parent = None):
+    def __init__(self, name: str, f_cost: int = 0):
         self.name = name
         self.f_cost: int = f_cost
-        self.parent: str = parent
 
     def successors(self) -> List[str]:
         successors = []

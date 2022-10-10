@@ -58,7 +58,10 @@ class Result(Enum):
     SUCCESS = 1
     FAILURE = 2
 
-count = 0 
+
+count = 0
+
+
 def RBFS(current_node: Node, f_limit: int) -> Tuple[Result, int]:
     global count
     print(f"RBFS[{count}], f_limit: {f_limit}, node: {current_node}")
@@ -83,13 +86,14 @@ def RBFS(current_node: Node, f_limit: int) -> Tuple[Result, int]:
             return Result.FAILURE, best.f_cost
         alternative: int = sys.maxsize
         if len(successors) > 1:
-                alternative = successors[1].f_cost
+            alternative = successors[1].f_cost
         print(f"\talternative: {alternative}")
         print(f"best: {best}")
         result, best.f_cost = RBFS(best, min(f_limit, alternative))
         print(f"\tbest: {best}")
         if result != Result.FAILURE:
             return result, 0
+
 
 def start():
     cls()
