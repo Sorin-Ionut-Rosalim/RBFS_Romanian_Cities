@@ -6,7 +6,7 @@ import os
 from sre_constants import SUCCESS
 import sys
 from traceback import print_tb
-from typing import List
+from typing import List, Tuple
 from Node import Node
 
 
@@ -50,7 +50,7 @@ def h(name: str) -> int:
 
 
 def recursive_best_first_search(start: str):
-    start_node = Node(start)
+    start_node = Node(start, f_cost=h(start))
     return RBFS(start_node, sys.maxsize)
 
 
@@ -58,24 +58,38 @@ class Result(Enum):
     SUCCESS = 1
     FAILURE = 2
 
-
-def RBFS(current_node: Node, f_limit: int):
+count = 0 
+def RBFS(current_node: Node, f_limit: int) -> Tuple[Result, int]:
+    global count
+    print(f"RBFS[{count}], f_limit: {f_limit}, node: {current_node}")
+    count = count + 1
     if current_node.name == "bucharest":
-        print("You are already at the goal!")
-        return Result.SUCCESS
+        return Result.SUCCESS, 0
     successors: List[Node] = []
     for succ in current_node.successors():
         succ_node = Node(succ)
+        print(f"before f_cost update: {succ_node}")
         succ_node.f_cost = max(succ_node.g(
             current_node.name) + h(succ), current_node.f_cost)
+        print(f"after f_cost update: {succ_node}")
         successors.append(succ_node)
-    successors.sort(key=attrgetter("f_cost"))
-
+    print(f"\tsuccs: {successors}")
+    if len(successors) == 0:
+        return Result.FAILURE, sys.maxsize
     while True:
+        successors.sort(key=attrgetter("f_cost"))
         best = min(successors, key=attrgetter("f_cost"))
         if best.f_cost > f_limit:
             return Result.FAILURE, best.f_cost
-
+        alternative: int = sys.maxsize
+        if len(successors) > 1:
+                alternative = successors[1].f_cost
+        print(f"\talternative: {alternative}")
+        print(f"best: {best}")
+        result, best.f_cost = RBFS(best, min(f_limit, alternative))
+        print(f"\tbest: {best}")
+        if result != Result.FAILURE:
+            return result, 0
 
 def start():
     cls()
@@ -86,13 +100,15 @@ def start():
         cls()
         print("The city you enterd is not valid, please try another one.\n")
         start_city = input("Insert the start city: ")
-
+    if start_city == "bucharest":
+        print("You are already at the goal!")
+        return Result.SUCCESS
     return recursive_best_first_search(start_city)
 
 
 def main():
     if start():
-        ty = 1 if input("Do you want to try again? y/n") == "y" else 0
+        ty = 1 if input("Do you want to try again? y/n:  ") == "y" else 0
         if ty:
             start()
 

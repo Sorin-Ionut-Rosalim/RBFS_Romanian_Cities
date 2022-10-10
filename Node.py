@@ -9,9 +9,10 @@ class Node:
     def __str__(self) -> str:
         return self.__repr__()
 
-    def __init__(self, name: str, f_cost: int = 0):
+    def __init__(self, name: str, f_cost: int = 0, parent = None):
         self.name = name
         self.f_cost: int = f_cost
+        self.parent: str = parent
 
     def successors(self) -> List[str]:
         successors = []
@@ -23,10 +24,11 @@ class Node:
         return sorted(successors)
 
     def g(self, parent: str) -> int:
+        distance = -1
         with open("cities.csv", newline='') as dataFile:
             reader = csv.DictReader(dataFile)
             for row in reader:
                 if row["city1"] == self.name:
                     if row["city2"] == parent:
-                        return int(row["distance"])
-
+                        distance = int(row["distance"])
+        return distance
