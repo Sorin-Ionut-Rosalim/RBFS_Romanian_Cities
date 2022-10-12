@@ -5,7 +5,7 @@ from typing import List
 heuristic = {"arad": 366,
              "bucharest": 0,
              "craiova": 160,
-             "dobetra": 242,
+             "drobeta": 242,
              "eforie": 161,
              "fagaras": 178,
              "giurgi": 77,
